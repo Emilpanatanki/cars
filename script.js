@@ -942,6 +942,109 @@ function join(){
 		setTimeout(orientCamera, 0);
 	}
 }
+// --- Local single-player mode (no Firebase / lobby) ---
+function startSinglePlayer() {
+    // Set up map, camera, render loop, etc.
+    join();
+
+    // Create a single local player car
+    var pid = "local-player";
+
+    var carMesh = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1, 1, 2),
+        new THREE.MeshLambertMaterial({ color: new THREE.Color("hsl(" + color + ", 100%, 50%)") })
+    );
+    carMesh.position.set(0, 0.6, 0);
+
+    // Four wheels (same as host/join code)
+    var wheel = new THREE.Mesh(
+        new THREE.CylinderBufferGeometry(0.5, 0.5, 0.2, 10),
+        new THREE.MeshLambertMaterial({ color: new THREE.Color("#222") })
+    );
+    function addWheel(dx, dz) {
+        var w = wheel.clone();
+        w.position.set(dx, -0.1, dz);
+        w.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+        carMesh.add(w);
+    }
+    addWheel(0.6, 0.7);
+    addWheel(-0.6, 0.7);
+    addWheel(0.6, -0.7);
+    addWheel(-0.6, -0.7);
+
+    carMesh.receiveShadow = true;
+    carMesh.castShadow = true;
+    scene.add(carMesh);
+
+    // Player data (copied from multiplayer logic)
+    players[pid] = {
+        data: {
+            x: 0,
+            y: 0,
+            xv: 0,
+            yv: 0,
+            dir: 0,
+            steer: 0,
+            color: color,
+            name: name,
+            checkpoint: 1,
+            lap: 0,
+            collision: {}
+        },
+        model: carMesh
+    };
+
+    // Small invisible label so existing code doesn't break
+    var label = document.createElement("DIV");
+    label.className = "label";
+    label.innerHTML = "";
+    label.position = carMesh.position;
+    f.appendChild(label);
+    labels.push(label);
+
+    // Hook into the existing "me" structure
+    me.data = players[pid].data;
+    me.model = carMesh;
+    me.label = label;
+    me.ref = {
+        set: function () { }, // no server in local mode
+        path: { pieces_: [null, null, pid] }
+    };
+
+    // HUD: countdown & lap display
+    gameStarted = true;
+    gameSortaStarted = true;
+
+    var countDown = document.createElement("DIV");
+    countDown.innerHTML = "3";
+    countDown.className = "title";
+    countDown.id = "countdown";
+    f.appendChild(countDown);
+
+    lap = document.createElement("DIV");
+    lap.innerHTML = "1/" + LAPS;
+    lap.className = "title";
+    lap.id = "lap";
+    f.appendChild(lap);
+
+    setTimeout(function () {
+        countDown.innerHTML = "2";
+    }, 1000);
+
+    setTimeout(function () {
+        countDown.innerHTML = "1";
+    }, 2000);
+
+    setTimeout(function () {
+        countDown.innerHTML = "GO!";
+        gameSortaStarted = false;
+    }, 3000);
+
+    setTimeout(function () {
+        countDown.innerHTML = "";
+    }, 4000);
+}
+
 codeCheck = function(){
 	var incode = document.getElementById("incode");
 	if(incode.value.length == 4){
