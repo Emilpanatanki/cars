@@ -1,4 +1,4 @@
-var SPEED = 0.004;
+var SPEED = 0.1;
 var CAMERA_LAG = 0.9;
 var COLLISION = 1.1;
 var BOUNCE = 0.7;
@@ -12,6 +12,19 @@ var LAPS = 3;
 function MODS(){
 
 }
+// Pulmonary-embolism question labels (pairs: left/right)
+var QUESTION_LABELS = [
+  ["Dyspnea", "Epistaxis"],
+  ["CTPA", "CXR"],
+  ["D-dimer", "Troponin"],
+  ["Sinus tachycardia", "ST depression"],
+  ["Right-heart strain", "LV hypertrophy"],
+  ["Hypoxemia", "Hypoglycemia"],
+  ["DOACs", "Aspirin"],
+  ["Pleuritic pain", "Pleurodynia"],
+  ["Wells score", "CHA2DS2-VASc"]
+];
+
 
 var serverList = [
 	{
