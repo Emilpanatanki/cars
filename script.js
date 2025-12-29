@@ -949,7 +949,7 @@ function join(){
         var dist = playerPos.distanceTo(pos3);
 
         // <<< THIS IS THE ONLY IMPORTANT LINE FOR YOU >>>
-        if (dist < 10) {   // show only within 50 world units of the car
+        if (dist < 10) {   // show only within 10 world units of the car
             var vec = toXYCoords(pos3);
             label.style.left = vec.x + "px";
             label.style.top = vec.y + "px";
