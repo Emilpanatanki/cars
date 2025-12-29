@@ -943,13 +943,13 @@ function join(){
     var pos3 = label.position;
     var show = false;
 
-    if (!VR && pos3 && frustum.containsPoint(pos3)) {
-        // Use the car position if available; otherwise use camera
+    if (pos3 && frustum.containsPoint(pos3)) {
+        // Use car position if available, otherwise camera
         var playerPos = (me && me.model) ? me.model.position : camera.position;
         var dist = playerPos.distanceTo(pos3);
 
-        // Only show labels when the car is reasonably close (tune 60 as you like)
-        if (dist < 60) {
+        // <<< THIS IS THE ONLY IMPORTANT LINE FOR YOU >>>
+        if (dist < 50) {   // show only within 50 world units of the car
             var vec = toXYCoords(pos3);
             label.style.left = vec.x + "px";
             label.style.top = vec.y + "px";
@@ -963,6 +963,7 @@ function join(){
         label.style.display = "none";
     }
 }
+
 
 		}
 
