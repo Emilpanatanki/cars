@@ -938,17 +938,16 @@ function join(){
 		camera.updateProjectionMatrix();
 		var frustum = new THREE.Frustum();
 		frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+
 		for (var i = 0; i < labels.length; i++) {
     var label = labels[i];
     var pos3 = label.position;
     var show = false;
 
     if (pos3 && frustum.containsPoint(pos3)) {
-        // Use car position if available, otherwise camera
         var playerPos = (me && me.model) ? me.model.position : camera.position;
         var dist = playerPos.distanceTo(pos3);
 
-        // <<< THIS IS THE ONLY IMPORTANT LINE FOR YOU >>>
         if (dist < 40) {
             var vec = toXYCoords(pos3);
             label.style.left = vec.x + "px";
@@ -963,6 +962,7 @@ function join(){
         label.style.display = "none";
     }
 }
+
 
 
 		
