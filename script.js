@@ -14,16 +14,16 @@ function MODS(){
 }
 // Pulmonary-embolism question labels (pairs: left/right)
 var QUESTION_LABELS = [
-  ["Dyspnea", "Epistaxis"],
-  ["CTPA", "CXR"],
-  ["D-dimer", "Troponin"],
-  ["Sinus tachycardia", "ST depression"],
-  ["Right-heart strain", "LV hypertrophy"],
-  ["Hypoxemia", "Hypoglycemia"],
-  ["DOACs", "Aspirin"],
-  ["Pleuritic pain", "Pleurodynia"],
-  ["Wells score", "CHA2DS2-VASc"]
+  ["Dyspnea", "Epistaxis"],          // J1  (L / R)
+  ["CTPA", "CXR"],                  // J2
+  ["D-dimer", "Troponin"],          // J3
+  ["Sinus tachycardia", "ST depression"], // J4
+  ["Right-heart strain", "LV hypertrophy"], // J5
+  ["Hypoxemia", "Hypoglycemia"],    // J6
+  ["DOACs", "Aspirin"],             // J7
+  ["Pleuritic pain", "Pleurodynia"] // J8
 ];
+
 
 
 var serverList = [
@@ -938,16 +938,32 @@ function join(){
 		camera.updateProjectionMatrix();
 		var frustum = new THREE.Frustum();
 		frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-		for(var i = 0; i < labels.length; i++){
-			var label = labels[i];
-			if(frustum.containsPoint(label.position) && !VR){
-				var vec = toXYCoords(label.position);
-				label.style.left = vec.x + "px";
-				label.style.top = vec.y + "px";
-				label.style.zIndex = 99999 - Math.floor(camera.position.distanceTo(label.position) * 10);
-				label.style.display = "inline-block";
-			}else
-				label.style.display = "none";
+		for (var i = 0; i < labels.length; i++) {
+    var label = labels[i];
+    var pos3 = label.position;
+    var show = false;
+
+    if (!VR && pos3 && frustum.containsPoint(pos3)) {
+        // Use the car position if available; otherwise use camera
+        var playerPos = (me && me.model) ? me.model.position : camera.position;
+        var dist = playerPos.distanceTo(pos3);
+
+        // Only show labels when the car is reasonably close (tune 60 as you like)
+        if (dist < 60) {
+            var vec = toXYCoords(pos3);
+            label.style.left = vec.x + "px";
+            label.style.top = vec.y + "px";
+            label.style.zIndex = 99999 - Math.floor(dist * 10);
+            label.style.display = "inline-block";
+            show = true;
+        }
+    }
+
+    if (!show) {
+        label.style.display = "none";
+    }
+}
+
 		}
 
 		if(windowsize.x != window.innerWidth || windowsize.x != window.innerHeight){
