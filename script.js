@@ -595,6 +595,29 @@ function loadMap(){
 		signs.add(s);
 	}
 	scene.add(signs);
+	// --- Add floating text labels over each sign cone ---
+(function () {
+  if (!signs || !signs.children || !QUESTION_LABELS || !f) return;
+
+  // We expect 2 signs per junction, so:
+  var maxLabels = Math.min(signs.children.length, QUESTION_LABELS.length * 2);
+
+  for (var i = 0; i < maxLabels; i++) {
+    var junctionIndex = Math.floor(i / 2);  // 0..8
+    var sideIndex = i % 2;                  // 0 = left text, 1 = right text
+    var text = QUESTION_LABELS[junctionIndex][sideIndex];
+
+    var label = document.createElement("DIV");
+    label.className = "label";
+    label.textContent = text;
+
+    // attach this DOM label to follow the corresponding sign
+    label.position = signs.children[i].position;
+    labels.push(label);
+    f.appendChild(label);
+  }
+})();
+
 
 	var startdata = document.getElementById("trackcode").innerHTML.trim().split("|")[1].trim().split(" ");
 	startc = new THREE.Object3D();
