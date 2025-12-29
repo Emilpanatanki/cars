@@ -610,6 +610,15 @@ function loadMap(){
     var label = document.createElement("DIV");
     label.className = "label";
     label.textContent = text;
+	label.style.fontSize = "12px"
+
+	   // NEW: remember which junction this label belongs to
+    label.junctionIndex = junctionIndex;
+
+    // attach this DOM label to follow the corresponding sign
+    label.position = signs.children[i].position;
+
+	  
 
     // attach this DOM label to follow the corresponding sign
     label.position = signs.children[i].position;
@@ -939,8 +948,35 @@ function join(){
 		var frustum = new THREE.Frustum();
 		frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 
+		var currentJunction = null;
+
+// Find which junction is closest to the player
+if (signs && signs.children && signs.children.length > 0 && me && me.model) {
+    var playerPosForJunction = me.model.position;
+    var nearestIndex = 0;
+    var nearestDistSq = Infinity;
+
+    for (var si = 0; si < signs.children.length; si++) {
+        var d = playerPosForJunction.distanceToSquared(signs.children[si].position);
+        if (d < nearestDistSq) {
+            nearestDistSq = d;
+            nearestIndex = si;
+        }
+    }
+
+    currentJunction = Math.floor(nearestIndex / 2); // 2 signs per junction
+}
+
+
 		for (var i = 0; i < labels.length; i++) {
     var label = labels[i];
+
+    // If we know which junction is current, hide labels from others
+    if (currentJunction !== null && label.junctionIndex !== currentJunction) {
+        label.style.display = "none";
+        continue;
+    }
+
     var pos3 = label.position;
     var show = false;
 
@@ -948,6 +984,7 @@ function join(){
         var playerPos = (me && me.model) ? me.model.position : camera.position;
         var dist = playerPos.distanceTo(pos3);
 
+        // You can tweak this distance (30–50)
         if (dist < 40) {
             var vec = toXYCoords(pos3);
             label.style.left = vec.x + "px";
@@ -962,6 +999,7 @@ function join(){
         label.style.display = "none";
     }
 }
+
 
 
 
